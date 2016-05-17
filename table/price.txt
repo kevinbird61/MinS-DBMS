@@ -1,0 +1,10 @@
+Buckets[0],6.99,6.99,6.99
+Buckets[1]
+Buckets[2],17.95
+Buckets[3],25
+Buckets[4]
+Buckets[5]
+Buckets[6],19.95
+Buckets[7],12.95,29.95,7.99
+Buckets[8]
+Buckets[9],25.95,14
