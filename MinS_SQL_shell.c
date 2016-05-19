@@ -3,33 +3,26 @@
 
 #define CMD_SIZE 1024
 
-typedef struct stringLink{
-	char name[64];
-	struct stringLink *next;
-} strLink;
-
-strLink *forSelect;
-strLink *forFrom;
-strLink *forWhere;
-
 void AddStrLink(strLink *header , char *name);
 void dealClause(strLink *header , char *name);
+void releaseAll(strLink *header);
+int result;
 
 // ** For fetching command ** //
-void fetch_cmd()
+int fetch_cmd()
 {
-	bool cmd_continue = true;
 	char *cmd;
-	
-	while(1)
-	{
-		// Fetch command
-		cmd = read_cmd();
-		// Parse the command
-		parse_cmd(cmd);
-		// Clear the command
-		memset(cmd,'\0',CMD_SIZE);
-	}
+	result = 1;
+	// Fetch command
+	cmd = read_cmd();
+	// Parse the command
+	parse_cmd(cmd);
+	// Clear the command
+	memset(cmd,'\0',CMD_SIZE);
+	releaseAll(forSelect);
+	releaseAll(forFrom);
+	releaseAll(forWhere);
+	return result;
 }
 
 // For read-in command
@@ -220,37 +213,11 @@ int parse_cmd(char *cmd)
 	}
 	if(!filter1 && !filter2 && !filter3)
 	{
-	    // Print for debug 
-	    strLink *header;
-	    header = forSelect;
-	    printf("SELECT :");
-	    while(header->next != NULL)
-	    {
-		    printf(",%s ",header->next->name);
-		    header = header->next;
-	    }
-	    printf("\n");
-	
-	    header = forFrom;
-	    printf("FROM :");
-	    while(header->next != NULL)
-	    {
-		    printf(",%s ",header->next->name);
-		    header = header->next;
-	    }
-	    printf("\n");
-
-	    header = forWhere;
-	    printf("WHERE :");
-	    while(header->next != NULL)
-	    {
-		    printf(",%s ",header->next->name);
-		    header = header->next;
-	    }
-	    printf("\n");
+	    result = 1;
 	}
 	else
 	{
+		result = 0;
 	    printf("Please retype your SQL Query again!\n");
 	}
 }
@@ -299,4 +266,16 @@ void AddStrLink(strLink *header , char *name)
 	memset(temp->name , '\0' , 64);
 	strcpy(temp->name , name);
 	link->next = temp;
+}
+
+void releaseAll(strLink *header)
+{
+    if(header->next != NULL)
+        releaseAll(header->next);
+    else
+    {
+        header = NULL;
+        free(header);
+    }
+    return;
 }
