@@ -61,7 +61,7 @@ int parse_cmd(char *cmd)
 	memset(from_cmd,'\0',512*sizeof(char));
 	memset(where_cmd,'\0',512*sizeof(char));
 	
-	int filter1 = 0,filter2 = 0,filter3 = 0;
+	int filter1 = 0,filter2 = 0,filter3 = 0,quit = 0;
 	
 	// The first header have empty name 
 	forSelect = (strLink *) malloc(sizeof(strLink));
@@ -76,7 +76,10 @@ int parse_cmd(char *cmd)
 	if(post_cmd[0] == '\0')
 	{
 		// if post command have nothing 
-
+		filter1 = 1;
+		filter2 = 1;
+		filter3 = 1;
+		if(strcmp_ctrl(pre_cmd,"quit",1)) quit = 1;
 	}
 	else
 	{
@@ -217,8 +220,16 @@ int parse_cmd(char *cmd)
 	}
 	else
 	{
-		result = 0;
-	    printf("Please retype your SQL Query again!\n");
+		if(quit == 1)
+		{
+			result = -1;
+			printf("Quit MinS!\n");
+		}
+		else
+		{
+			result = 0;
+	    	printf("Please retype your SQL Query again!\n");
+	    }
 	}
 }
 

@@ -4,6 +4,7 @@
 #define READLEN 100
 #define FILEBOOK "../data/books.txt"
 #define FILESELL "../data/sellRecord.txt"
+#define PDEBUG false
 
 typedef struct book{
 	char isbn[32];
@@ -34,10 +35,11 @@ books *books_Header;
 sells *sells_Header;
 
 void read_SrcFile();
-void addBucket(char *attri , books *b_info , sells *s_info, int attri_number); // TODO : add 2 type of info input , when attri_number between 0~4 belong to books ; between 5~7 belong to sells 
-books *addBooks(books *header , char *is , char *au,char *tit,char *pri,char *sub); // TODO : need to return the current books pointer
-sells *addSells(sells *header , char *ui,char *n,char *is_n); // TODO : need to return the current sells pointer
+void addBucket(char *attri , books *b_info , sells *s_info, int attri_number); 
+books *addBooks(books *header , char *is , char *au,char *tit,char *pri,char *sub); 
+sells *addSells(sells *header , char *ui,char *n,char *is_n);
 void printBucket();
+void printSQL();
 int hash33(char *key);
 
 int main(int argc , char *argv[])
@@ -50,41 +52,20 @@ int main(int argc , char *argv[])
 	// Fetch command , and do the correspond thing 
 	while(1)
 	{
-		int print = fetch_cmd();
+		int result = fetch_cmd();
 		// Print for debug 
-		/*
-		if(print)
+		if(result==1)
 		{
-			strLink *header;
-			header = forSelect;
-			printf("SELECT :");
-			while(header->next != NULL)
+			printSQL();	
+			if(PDEBUG)
 			{
-				printf(",%s ",header->next->name);
-				header = header->next;
+				printBucket();
 			}
-			printf("\n");
-	
-			header = forFrom;
-			printf("FROM :");
-			while(header->next != NULL)
-			{
-				printf(",%s ",header->next->name);
-				header = header->next;
-			}
-			printf("\n");
-
-			header = forWhere;
-			printf("WHERE :");
-			while(header->next != NULL)
-			{
-				printf(",%s ",header->next->name);
-				header = header->next;
-			}
-			printf("\n");
 		}
-		*/
-		printBucket();
+		else if(result==-1)
+		{
+			break;
+		}
 		// And Now we have storage data and SQL query
 		
 	}
@@ -110,8 +91,8 @@ void read_SrcFile()
 	    for(int j = 0; j < 10; j++)
 	    {
 	        bucket_Header[i][j].next = NULL;
-	        //bucket_Header[i][j].booksInfo = NULL;
-	        //bucket_Header[i][j].sellsInfo = NULL;
+	        bucket_Header[i][j].booksInfo = NULL;
+	        bucket_Header[i][j].sellsInfo = NULL;
 	    }
 	}
 	// Read the resource data
@@ -307,13 +288,44 @@ void printBucket()
             while(header->next != NULL)
             {
                 printf("-> %s",header->next->value);
-                //printf(" and %s ", header->next->booksInfo->isbn);
-                //printf(" and %s ", header->next->sellsInfo->uid);
+                printf(" and %s ", header->next->booksInfo->isbn);
+                printf(" and %s ", header->next->sellsInfo->uid);
                 header = header->next;
             }
             printf("\n");
         }
     }   
+}
+
+void printSQL()
+{
+	strLink *header;
+	header = forSelect;
+	printf("SELECT :");
+	while(header->next != NULL)
+	{
+		printf(",%s ",header->next->name);
+		header = header->next;
+	}
+	printf("\n");
+
+	header = forFrom;
+	printf("FROM :");
+	while(header->next != NULL)
+	{
+		printf(",%s ",header->next->name);
+		header = header->next;
+	}
+	printf("\n");
+
+	header = forWhere;
+	printf("WHERE :");
+	while(header->next != NULL)
+	{
+		printf(",%s ",header->next->name);
+		header = header->next;
+	}
+	printf("\n");
 }
 
 int hash33(char *key)
