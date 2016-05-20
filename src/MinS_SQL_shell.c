@@ -61,7 +61,7 @@ int parse_cmd(char *cmd)
 	memset(from_cmd,'\0',512*sizeof(char));
 	memset(where_cmd,'\0',512*sizeof(char));
 	
-	int filter1 = 0,filter2 = 0,filter3 = 0,quit = 0;
+	int filter1 = 0,filter2 = 0,quit = 0;
 	
 	// The first header have empty name 
 	forSelect = (strLink *) malloc(sizeof(strLink));
@@ -78,7 +78,6 @@ int parse_cmd(char *cmd)
 		// if post command have nothing 
 		filter1 = 1;
 		filter2 = 1;
-		filter3 = 1;
 		if(strcmp_ctrl(pre_cmd,"quit",1)) quit = 1;
 	}
 	else
@@ -90,11 +89,12 @@ int parse_cmd(char *cmd)
 		{
 			// if return 1 , compare !
 			// Then Fetch the SELECT strings 
-			sscanf(post_cmd , "%[^FROM]%[FROM]%[^\n]" , select_cmd , from_cmd , post_cmd);
+			sscanf(post_cmd , "%[^F]%[FROM]%[^\n]" , select_cmd , from_cmd , post_cmd);
+			int count = 0;
 			// After we have the strings after SELECT , we can manipulate it!
 			while(1)
 			{
-				if(strlen(select_cmd) <= 2 && strcmp_ctrl(select_cmd,"*",0))
+				if(strlen(select_cmd) <= 2 && strcmp_ctrl(select_cmd,"*",0) && count == 0)
 				{
 					// Compare with "*" , notice : now's string length is 2
 					AddStrLink(forSelect,"*");
@@ -158,34 +158,25 @@ int parse_cmd(char *cmd)
 						printf("%s \n",select_cmd);
 					}
 				}
+				count++;
 			} // <SELECT> while Loop end , and get the SELECT string token
 			if(strcmp_ctrl(from_cmd,"FROM",0))
 			{
 				// Reusing from_cmd again
 				memset(from_cmd,'\0',512*sizeof(char));
-				char post[512];
-				sscanf(post_cmd , "%[^WHERE]%[WHERE]%[^\n]" , from_cmd ,where_cmd, post);
+				sscanf(post_cmd , "%[^W]%*[WHERE]%[^\n]" , from_cmd ,where_cmd);
 				//printf("After cut : %s , leftover %s\n",from_cmd ,post);
 				// Remapping to post_cmd
 				memset(post_cmd,'\0',1024*sizeof(char));
-				strcpy(post_cmd,post);
+				strcpy(post_cmd,where_cmd);
 				// And now , from_cmd contained the string of from , and post contain the string of where 
 				// parse the from_cmd
 				dealClause(forFrom,from_cmd);
 				// do where paring
-				if(strcmp_ctrl(where_cmd,"WHERE",0))
-				{
-					// Don't need to reuse where_cmd again , post_cmd now is the string we need 
-					printf("where clause : %s\n",post_cmd);
-					// Manipulate the post_cmd , add these into forwhere's linked-list
-					dealClause(forWhere,post_cmd);
-				}
-				else
-				{
-					printf("Fail to Compare when reach to WHERE clause\n");
-					// Also need to set the filter 
-					filter3 = 1;
-				}
+				// Don't need to reuse where_cmd again , post_cmd now is the string we need 
+				printf("where clause : %s\n",post_cmd);
+				// Manipulate the post_cmd , add these into forwhere's linked-list
+				dealClause(forWhere,post_cmd);
 			}
 			else
 			{
@@ -214,7 +205,7 @@ int parse_cmd(char *cmd)
 		memset(pre_cmd,'\0',64*sizeof(char));
 		memset(post_cmd,'\0',1024*sizeof(char));
 	}
-	if(!filter1 && !filter2 && !filter3)
+	if(!filter1 && !filter2)
 	{
 	    result = 1;
 	}

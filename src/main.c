@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "MinS_SQL_shell.h"
+#include "stringOperation.h"
 
 #define READLEN 100
 #define FILEBOOK "../data/books.txt"
@@ -30,11 +31,14 @@ typedef struct attrivalue{
 } attri_Value;
 
 char **attri_Name;
+char table_name_1[5];
+char table_name_2[10];
 attri_Value **bucket_Header;
 books *books_Header;
 sells *sells_Header;
 
 void read_SrcFile();
+void Do_SQL();
 void addBucket(char *attri , books *b_info , sells *s_info, int attri_number); 
 books *addBooks(books *header , char *is , char *au,char *tit,char *pri,char *sub); 
 sells *addSells(sells *header , char *ui,char *n,char *is_n);
@@ -67,10 +71,330 @@ int main(int argc , char *argv[])
 			break;
 		}
 		// And Now we have storage data and SQL query
+		Do_SQL();
 		
+		printf("==============================================\n");
 	}
 	
 	return 0;
+}
+
+void Do_SQL()
+{	
+	// Check for the FROM clause : FETCH for join and on
+	strLink *header; 
+	header = forFrom;
+	while(header->next != NULL)
+	{
+		char comp1[64];
+		char comp2[64];
+		char comp1_attr[64];
+		char comp2_attr[64];
+		memset(comp1,'\0',64*sizeof(char));
+		memset(comp2,'\0',64*sizeof(char));
+		memset(comp1_attr,'\0',64*sizeof(char));
+		memset(comp2_attr,'\0',64*sizeof(char));
+		sscanf(header->next->name,"%[^/^JOIN/]%*[/JOIN$/]%[^/^ON/]%*[/ON$/]%[^/^=/]%*[=]%s",comp1,comp2,comp1_attr,comp2_attr);
+		printf("Cut for FORM : %s %s %s %s\n",comp1,comp2,comp1_attr,comp2_attr);
+		sscanf(comp1,"%s",comp1);
+		sscanf(comp2,"%s",comp2);
+		// TODO : Do for more robust string compare , and Check if comp1 and comp2 is in your table name,
+		// and implement with it (rebuild the tables).
+		if(strcmp_ctrl(comp1,table_name_1,0))
+		{
+			// comp1 = table1
+			if(strcmp_ctrl(comp2,table_name_2,0))
+			{
+				// comp2 = table2 , do the table attribute match
+				// TODO : when 2 table all get , need to check the join string 
+				printf("Match!\n");
+				
+			}
+			else
+			{
+				// Consider when comp2 empty
+				if(strlen(comp2)<=1)
+				{
+					// Only need to consider comp1 , now get the SELECT strings 
+					// Check for the Select clause : legal or not
+					strLink *header2;
+					header2 = forSelect;
+					int count = 0;
+					printf("Judge SELECT :");
+					while(header2->next != NULL)
+					{
+						if(header2->next->name[0]=='*' && count == 0)
+						{
+							// If compare with this , check whether the other behind
+							if(strlen(header2->next->name)>2)
+							{
+								printf("Error with string behind '*' , len is %d\n",(int)strlen(header2->next->name));
+								return;
+							}
+							else
+							{
+								// Prepare the print out all the attributes of that table_1 !
+								printf("List all attribute in table - %s :\n",table_name_1);
+								printf("%-20s %-20s %-20s %-20s %-20s\n",attri_Name[0],attri_Name[1],attri_Name[2],attri_Name[3],attri_Name[4]);
+								for(int j=0;j<10;j++)
+								{
+									attri_Value *header = &bucket_Header[0][j];
+									while(header->next != NULL)
+									{
+										// Check for the WHERE clause : FETCH for GROUP and "=" for compare
+										strLink *header_w = forWhere;
+										while(header_w->next != NULL)
+										{
+											char comp_1[64];
+											memset(comp_1,'\0',64*sizeof(char));
+											char comp_2[64];
+											memset(comp_2,'\0',64*sizeof(char));
+											sscanf(header_w->next->name,"%[^\n]", comp_1);
+											sscanf(comp_1,"%[^=]%*[=]%[^\n]",comp_1,comp_2);
+											sscanf(comp_1,"%s",comp_1);
+											
+											if(strcmp_ctrl(comp_1,attri_Name[0],0))
+											{
+												if(strcmp_ctrl(header->next->booksInfo->isbn,comp_2,0))
+												{
+													// Success and print 
+													printf("%-20s ", header->next->booksInfo->isbn);
+													printf("%-20s ", header->next->booksInfo->author);
+													printf("%-20s ", header->next->booksInfo->title);
+													printf("%-20s ", header->next->booksInfo->price);
+													printf("%-20s \n", header->next->booksInfo->subject);			
+												}
+												else
+												{
+													//printf("Not found value of %s in attribute - %s\n",comp_2,comp_1);
+												}
+											}
+											else if(strcmp_ctrl(comp_1,attri_Name[1],0))
+											{
+												if(strcmp_ctrl(header->next->booksInfo->author,comp_2,0))
+												{
+													// Success and print 
+													printf("%-20s ", header->next->booksInfo->isbn);
+													printf("%-20s ", header->next->booksInfo->author);
+													printf("%-20s ", header->next->booksInfo->title);
+													printf("%-20s ", header->next->booksInfo->price);
+													printf("%-20s \n", header->next->booksInfo->subject);			
+												}
+												else
+												{
+													//printf("Not found value of %s in attribute - %s\n",comp_2,comp_1);
+												}
+											}
+											else if(strcmp_ctrl(comp_1,attri_Name[2],0))
+											{
+												if(strcmp_ctrl(header->next->booksInfo->title,comp_2,0))
+												{
+													// Success and print 
+													printf("%-20s ", header->next->booksInfo->isbn);
+													printf("%-20s ", header->next->booksInfo->author);
+													printf("%-20s ", header->next->booksInfo->title);
+													printf("%-20s ", header->next->booksInfo->price);
+													printf("%-20s \n", header->next->booksInfo->subject);			
+												}
+												else
+												{
+													//printf("Not found value of %s in attribute - %s\n",comp_2,comp_1);
+												}
+											}
+											else if(strcmp_ctrl(comp_1,attri_Name[3],0))
+											{
+												if(strcmp_ctrl(header->next->booksInfo->price,comp_2,0))
+												{
+													// Success and print 
+													printf("%-20s ", header->next->booksInfo->isbn);
+													printf("%-20s ", header->next->booksInfo->author);
+													printf("%-20s ", header->next->booksInfo->title);
+													printf("%-20s ", header->next->booksInfo->price);
+													printf("%-20s \n", header->next->booksInfo->subject);			
+												}
+												else
+												{
+													//printf("Not found value of %s in attribute - %s\n",comp_2,comp_1);
+												}
+											}
+											else if(strcmp_ctrl(comp_1,attri_Name[4],0))
+											{
+												if(strcmp_ctrl(header->next->booksInfo->subject,comp_2,0))
+												{
+													// Success and print 
+													printf("%-20s ", header->next->booksInfo->isbn);
+													printf("%-20s ", header->next->booksInfo->author);
+													printf("%-20s ", header->next->booksInfo->title);
+													printf("%-20s ", header->next->booksInfo->price);
+													printf("%-20s \n", header->next->booksInfo->subject);			
+												}
+												else
+												{
+													//printf("Not found value of %s in attribute - %s\n",comp_2,comp_1);
+												}
+											}
+											else
+											{
+												printf("Not found this attribute-%s in table %s\n",table_name_1,comp_1);
+											}
+											header_w = header_w->next;
+										}
+										header = header->next;
+									}
+								}
+								
+								break;
+							}
+						}
+						else
+						{
+							// TODO : implement selected attri_Name , and also need to check WHERE 
+							printf(" %s",header2->next->name);
+						}
+						header2 = header2->next;
+						count++;
+					}
+					printf("\n");
+				}
+				else
+				{
+					// comp2 != table2 (reject) , print out error
+					printf("Error , don't have %s table!\n",comp2);
+				}
+			}
+		}
+		else if(strcmp_ctrl(comp1,table_name_2,0))
+		{
+			// comp1 = table2
+			if(strcmp_ctrl(comp2,table_name_1,0))
+			{
+				// comp2 = table1 , do the tables attributes
+				// TODO : when 2 table all get , need to check the join string
+				printf("Match!\n");
+			}
+			else
+			{	
+				// Consider when comp2 empty
+				if(strlen(comp2)<=1)
+				{
+					// Only need to consider comp1 , now get the SELECT strings 
+					// Check for the Select clause : legal or not
+					strLink *header2;
+					header2 = forSelect;
+					int count = 0;
+					printf("Judge SELECT :");
+					while(header2->next != NULL)
+					{
+						if(header2->next->name[0]=='*' && count == 0)
+						{
+							// If compare with this , check whether the other behind
+							if(strlen(header2->next->name)>2)
+							{
+								printf("Error with string behind '*' , len is %d\n",(int)strlen(header2->next->name));
+								return;
+							}
+							else
+							{
+								// Prepare the print out all the attributes of that table_1 !
+								printf("List all attribute in table - %s :\n",table_name_2);
+								printf("%-20s %-20s %-20s \n",attri_Name[5],attri_Name[6],attri_Name[7]);
+								for(int j=0;j<10;j++)
+								{
+									attri_Value *header = &bucket_Header[5][j];
+									while(header->next != NULL)
+									{
+										// Check for the WHERE clause : FETCH for GROUP and "=" for compare
+										strLink *header_w = forWhere;
+										while(header_w->next != NULL)
+										{
+											char comp_1[64];
+											memset(comp_1,'\0',64*sizeof(char));
+											char comp_2[64];
+											memset(comp_2,'\0',64*sizeof(char));
+											sscanf(header_w->next->name,"%[^\n]", comp_1);
+											sscanf(comp_1,"%[^=]%*[=]%[^\n]",comp_1,comp_2);
+											sscanf(comp_1,"%s",comp_1);
+											if(strcmp_ctrl(comp_1,attri_Name[5],0))
+											{
+												if(strcmp_ctrl(header->next->sellsInfo->uid,comp_2,0))
+												{
+													// Success and print 
+													printf("%-20s ", header->next->sellsInfo->uid);
+													printf("%-20s ", header->next->sellsInfo->no);
+													printf("%-20s \n", header->next->sellsInfo->isbn_no);			
+												}
+												else
+												{
+													//printf("Not found value of %s in attribute - %s\n",comp_2,comp_1);
+												}
+											}
+											else if(strcmp_ctrl(comp_1,attri_Name[6],0))
+											{
+												if(strcmp_ctrl(header->next->booksInfo->author,comp_2,0))
+												{
+													// Success and print 
+													printf("%-20s ", header->next->sellsInfo->uid);
+													printf("%-20s ", header->next->sellsInfo->no);
+													printf("%-20s \n", header->next->sellsInfo->isbn_no);				
+												}
+												else
+												{
+													//printf("Not found value of %s in attribute - %s\n",comp_2,comp_1);
+												}
+											}
+											else if(strcmp_ctrl(comp_1,attri_Name[7],0))
+											{
+												if(strcmp_ctrl(header->next->booksInfo->title,comp_2,0))
+												{
+													// Success and print 
+													printf("%-20s ", header->next->sellsInfo->uid);
+													printf("%-20s ", header->next->sellsInfo->no);
+													printf("%-20s \n", header->next->sellsInfo->isbn_no);			
+												}
+												else
+												{
+													//printf("Not found value of %s in attribute - %s\n",comp_2,comp_1);
+												}
+											}
+											else
+											{
+												printf("Not found this attribute-%s in table %s\n",table_name_2,comp_1);
+											}
+											header_w = header_w->next;
+										}
+										header = header->next;
+									}
+								}
+								
+								break;
+							}
+						}
+						else
+						{
+							// TODO : implement
+							printf(" %s",header2->next->name);
+						}
+						header2 = header2->next;
+						count++;
+					}
+					printf("\n");
+				}
+				else
+				{
+					// comp2 != table1 (reject) , print out error
+					printf("Error , don't have %s table!\n",comp2);
+				}
+			}
+		}
+		else{
+			// comp1 compare to none of each tables (reject)
+			printf("Error with comp1 %s !\n",comp1);
+		}
+		header = header->next;
+	}
+	
+	
+	
 }
 
 void read_SrcFile()
@@ -99,7 +423,6 @@ void read_SrcFile()
 	FILE *fp;
 	fp = fopen(FILEBOOK,"r");
 	// Store for table name
-	char table_name_1[5];
 	strcpy(table_name_1 , "books");
 	char *str = malloc(sizeof(char)*READLEN);
 	int count = 0;
@@ -130,7 +453,6 @@ void read_SrcFile()
 	FILE *fp2;
 	fp2 = fopen(FILESELL,"r");
 	// Store for table name
-	char table_name_2[10];
 	strcpy(table_name_2 , "sellRecord");
 	memset(str ,'\0' , READLEN*sizeof(char));
 	count = 0;
@@ -192,26 +514,6 @@ void read_SrcFile()
 		}
 		fclose(fwrite);
 		memset(filename,'\0',64*sizeof(char));
-	}
-	
-	// For struct debugging
-	books *header;
-	header = books_Header;
-	printf("Books Header:\n");
-	// First header is empty
-	while(header->next != NULL)
-	{
-		printf(",%s,%s,%s,%s,%s \n",header->next->isbn,header->next->author,header->next->title,header->next->price,header->next->subject);	
-		header = header->next;
-	}
-
-	sells *header2 = sells_Header;
-	printf("Sells Header:\n");
-	// First header is empty
-	while(header2->next != NULL)
-	{
-		printf(",%s,%s,%s \n",header2->next->uid,header2->next->no,header2->next->isbn_no);	
-		header2 = header2->next;
 	}
 	fclose(fp);
 	fclose(fp2);
@@ -295,6 +597,25 @@ void printBucket()
             printf("\n");
         }
     }   
+    // For struct debugging
+	books *header1;
+	header1 = books_Header;
+	printf("Books Header:\n");
+	// First header is empty
+	while(header1->next != NULL)
+	{
+		printf(",%s,%s,%s,%s,%s \n",header1->next->isbn,header1->next->author,header1->next->title,header1->next->price,header1->next->subject);	
+		header1 = header1->next;
+	}
+
+	sells *header2 = sells_Header;
+	printf("Sells Header:\n");
+	// First header is empty
+	while(header2->next != NULL)
+	{
+		printf(",%s,%s,%s \n",header2->next->uid,header2->next->no,header2->next->isbn_no);	
+		header2 = header2->next;
+	}
 }
 
 void printSQL()

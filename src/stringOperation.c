@@ -12,6 +12,8 @@ int strcmp_ctrl(char *str1 , char *str2,int mode)
 	if(len1 != len2)
 	{
 		// two length are different
+		free(temp1);
+		free(temp2);
 		return 0;
 	}
 	else
@@ -38,9 +40,13 @@ int strcmp_ctrl(char *str1 , char *str2,int mode)
 			if(temp1[i] != temp2[i])
 			{
 				// when one compare fail , return -1
+				free(temp1);
+				free(temp2);
 				return 0;
 			}
 		}
+		free(temp1);
+		free(temp2);
 		return 1;
 	}
 }
