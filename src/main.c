@@ -164,10 +164,6 @@ void Do_SQL()
 													printf("%-20s ", header->next->booksInfo->price);
 													printf("%-20s \n", header->next->booksInfo->subject);			
 												}
-												else
-												{
-													//printf("Not found value of %s in attribute - %s\n",comp_2,comp_1);
-												}
 											}
 											else if(strcmp_ctrl(comp_1,attri_Name[1],0))
 											{
@@ -179,10 +175,6 @@ void Do_SQL()
 													printf("%-20s ", header->next->booksInfo->title);
 													printf("%-20s ", header->next->booksInfo->price);
 													printf("%-20s \n", header->next->booksInfo->subject);			
-												}
-												else
-												{
-													//printf("Not found value of %s in attribute - %s\n",comp_2,comp_1);
 												}
 											}
 											else if(strcmp_ctrl(comp_1,attri_Name[2],0))
@@ -196,10 +188,6 @@ void Do_SQL()
 													printf("%-20s ", header->next->booksInfo->price);
 													printf("%-20s \n", header->next->booksInfo->subject);			
 												}
-												else
-												{
-													//printf("Not found value of %s in attribute - %s\n",comp_2,comp_1);
-												}
 											}
 											else if(strcmp_ctrl(comp_1,attri_Name[3],0))
 											{
@@ -212,10 +200,6 @@ void Do_SQL()
 													printf("%-20s ", header->next->booksInfo->price);
 													printf("%-20s \n", header->next->booksInfo->subject);			
 												}
-												else
-												{
-													//printf("Not found value of %s in attribute - %s\n",comp_2,comp_1);
-												}
 											}
 											else if(strcmp_ctrl(comp_1,attri_Name[4],0))
 											{
@@ -227,10 +211,6 @@ void Do_SQL()
 													printf("%-20s ", header->next->booksInfo->title);
 													printf("%-20s ", header->next->booksInfo->price);
 													printf("%-20s \n", header->next->booksInfo->subject);			
-												}
-												else
-												{
-													//printf("Not found value of %s in attribute - %s\n",comp_2,comp_1);
 												}
 											}
 											else
@@ -323,10 +303,6 @@ void Do_SQL()
 													printf("%-20s ", header->next->sellsInfo->no);
 													printf("%-20s \n", header->next->sellsInfo->isbn_no);			
 												}
-												else
-												{
-													//printf("Not found value of %s in attribute - %s\n",comp_2,comp_1);
-												}
 											}
 											else if(strcmp_ctrl(comp_1,attri_Name[6],0))
 											{
@@ -337,10 +313,6 @@ void Do_SQL()
 													printf("%-20s ", header->next->sellsInfo->no);
 													printf("%-20s \n", header->next->sellsInfo->isbn_no);				
 												}
-												else
-												{
-													//printf("Not found value of %s in attribute - %s\n",comp_2,comp_1);
-												}
 											}
 											else if(strcmp_ctrl(comp_1,attri_Name[7],0))
 											{
@@ -350,10 +322,6 @@ void Do_SQL()
 													printf("%-20s ", header->next->sellsInfo->uid);
 													printf("%-20s ", header->next->sellsInfo->no);
 													printf("%-20s \n", header->next->sellsInfo->isbn_no);			
-												}
-												else
-												{
-													//printf("Not found value of %s in attribute - %s\n",comp_2,comp_1);
 												}
 											}
 											else
