@@ -39,6 +39,7 @@ sells *sells_Header;
 
 void read_SrcFile();
 void Do_SQL();
+int judgeSelect(strLink *header,int mode);
 void addBucket(char *attri , books *b_info , sells *s_info, int attri_number); 
 books *addBooks(books *header , char *is , char *au,char *tit,char *pri,char *sub); 
 sells *addSells(sells *header , char *ui,char *n,char *is_n);
@@ -98,7 +99,7 @@ void Do_SQL()
 		printf("Cut for FORM : %s %s %s %s\n",comp1,comp2,comp1_attr,comp2_attr);
 		sscanf(comp1,"%s",comp1);
 		sscanf(comp2,"%s",comp2);
-		// TODO : Do for more robust string compare , and Check if comp1 and comp2 is in your table name,
+		// Do for more robust string compare , and Check if comp1 and comp2 is in your table name,
 		// and implement with it (rebuild the tables).
 		if(strcmp_ctrl(comp1,table_name_1,0))
 		{
@@ -107,8 +108,8 @@ void Do_SQL()
 			{
 				// comp2 = table2 , do the table attribute match
 				// TODO : when 2 table all get , need to check the join string 
-				printf("Match!\n");
 				
+				printf("Match!\n");
 			}
 			else
 			{
@@ -149,9 +150,10 @@ void Do_SQL()
 											memset(comp_1,'\0',64*sizeof(char));
 											char comp_2[64];
 											memset(comp_2,'\0',64*sizeof(char));
-											sscanf(header_w->next->name,"%[^\n]", comp_1);
-											sscanf(comp_1,"%[^=]%*[=]%[^\n]",comp_1,comp_2);
+											sscanf(header_w->next->name,"%[^=]%*[=]%[^\n]",comp_1,comp_2);
 											sscanf(comp_1,"%s",comp_1);
+											
+											printf("comp1: %s , comp2: %s\n",comp_1,comp_2);
 											
 											if(strcmp_ctrl(comp_1,attri_Name[0],0))
 											{
@@ -215,7 +217,18 @@ void Do_SQL()
 											}
 											else
 											{
-												printf("Not found this attribute-%s in table %s\n",table_name_1,comp_1);
+												if(strlen(comp_1) == 0)
+												{
+													printf("%-20s ", header->next->booksInfo->isbn);
+													printf("%-20s ", header->next->booksInfo->author);
+													printf("%-20s ", header->next->booksInfo->title);
+													printf("%-20s ", header->next->booksInfo->price);
+													printf("%-20s \n", header->next->booksInfo->subject);		
+												}
+												else
+												{
+													printf("Not found this attribute-%s in table %s\n",comp_1,table_name_1);	
+												}
 											}
 											header_w = header_w->next;
 										}
@@ -228,8 +241,160 @@ void Do_SQL()
 						}
 						else
 						{
-							// TODO : implement selected attri_Name , and also need to check WHERE 
-							printf(" %s",header2->next->name);
+							// TODO : implement selected attri_Name , and also need to check WHERE
+							// Judge whether if attri_Name SELECT clause have
+							int result = judgeSelect(forSelect,0);
+							printf("%d\n",result);
+							if((result & 1)==1)
+								printf("%-20s ",attri_Name[0]);
+							if((result & 2)==2)
+								printf("%-20s ",attri_Name[1]);
+							if((result & 4)==4)
+								printf("%-20s ",attri_Name[2]);
+							if((result & 8)==8)
+								printf("%-20s ",attri_Name[3]);
+							if((result & 16)==16)
+								printf("%-20s ",attri_Name[4]);
+							printf("\n");	
+							
+							for(int j=0;j<10;j++)
+								{
+									attri_Value *header = &bucket_Header[0][j];
+									while(header->next != NULL)
+									{
+										// Check for the WHERE clause : FETCH for GROUP and "=" for compare
+										strLink *header_w = forWhere;
+										while(header_w->next != NULL)
+										{
+											char comp_1[64];
+											memset(comp_1,'\0',64*sizeof(char));
+											char comp_2[64];
+											memset(comp_2,'\0',64*sizeof(char));
+											//sscanf(header_w->next->name,"%[^\n]", comp_1);
+											sscanf(header_w->next->name,"%[^=] = %[^\n]",comp_1,comp_2);
+											sscanf(comp_1,"%s",comp_1);
+											
+											//printf("comp1: %s , comp2: %s\n",comp_1,comp_2);
+											
+											if(strcmp_ctrl(comp_1,attri_Name[0],0))
+											{
+												if(strcmp_ctrl(header->next->booksInfo->isbn,comp_2,0))
+												{
+													// Success and print 
+													if((result & 1)==1)
+														printf("%-20s ", header->next->booksInfo->isbn);
+													if((result & 2)==2)
+														printf("%-20s ", header->next->booksInfo->author);
+													if((result & 4)==4)
+														printf("%-20s ", header->next->booksInfo->title);
+													if((result & 8)==8)
+														printf("%-20s ", header->next->booksInfo->price);
+													if((result & 16)==16)
+														printf("%-20s ", header->next->booksInfo->subject);
+													printf("\n");		
+												}
+											}
+											else if(strcmp_ctrl(comp_1,attri_Name[1],0))
+											{
+												if(strcmp_ctrl(header->next->booksInfo->author,comp_2,0))
+												{
+													// Success and print 
+													if((result & 1)==1)
+														printf("%-20s ", header->next->booksInfo->isbn);
+													if((result & 2)==2)
+														printf("%-20s ", header->next->booksInfo->author);
+													if((result & 4)==4)
+														printf("%-20s ", header->next->booksInfo->title);
+													if((result & 8)==8)
+														printf("%-20s ", header->next->booksInfo->price);
+													if((result & 16)==16)
+														printf("%-20s ", header->next->booksInfo->subject);
+													printf("\n");			
+												}
+											}
+											else if(strcmp_ctrl(comp_1,attri_Name[2],0))
+											{
+												if(strcmp_ctrl(header->next->booksInfo->title,comp_2,0))
+												{
+													// Success and print 
+													if((result & 1)==1)
+														printf("%-20s ", header->next->booksInfo->isbn);
+													if((result & 2)==2)
+														printf("%-20s ", header->next->booksInfo->author);
+													if((result & 4)==4)
+														printf("%-20s ", header->next->booksInfo->title);
+													if((result & 8)==8)
+														printf("%-20s ", header->next->booksInfo->price);
+													if((result & 16)==16)
+														printf("%-20s ", header->next->booksInfo->subject);
+													printf("\n");			
+												}
+											}
+											else if(strcmp_ctrl(comp_1,attri_Name[3],0))
+											{
+												if(strcmp_ctrl(header->next->booksInfo->price,comp_2,0))
+												{
+													// Success and print 
+													if((result & 1)==1)
+														printf("%-20s ", header->next->booksInfo->isbn);
+													if((result & 2)==2)
+														printf("%-20s ", header->next->booksInfo->author);
+													if((result & 4)==4)
+														printf("%-20s ", header->next->booksInfo->title);
+													if((result & 8)==8)
+														printf("%-20s ", header->next->booksInfo->price);
+													if((result & 16)==16)
+														printf("%-20s ", header->next->booksInfo->subject);
+													printf("\n");			
+												}
+											}
+											else if(strcmp_ctrl(comp_1,attri_Name[4],0))
+											{
+												if(strcmp_ctrl(header->next->booksInfo->subject,comp_2,0))
+												{
+													// Success and print 
+													if((result & 1)==1)
+														printf("%-20s ", header->next->booksInfo->isbn);
+													if((result & 2)==2)
+														printf("%-20s ", header->next->booksInfo->author);
+													if((result & 4)==4)
+														printf("%-20s ", header->next->booksInfo->title);
+													if((result & 8)==8)
+														printf("%-20s ", header->next->booksInfo->price);
+													if((result & 16)==16)
+														printf("%-20s ", header->next->booksInfo->subject);
+													printf("\n");			
+												}
+											}
+											else
+											{
+												// When there don't have WHERE clause 
+												if(strlen(comp_1) == 0)
+												{
+													if((result & 1)==1)
+														printf("%-20s ", header->next->booksInfo->isbn);
+													if((result & 2)==2)
+														printf("%-20s ", header->next->booksInfo->author);
+													if((result & 4)==4)
+														printf("%-20s ", header->next->booksInfo->title);
+													if((result & 8)==8)
+														printf("%-20s ", header->next->booksInfo->price);
+													if((result & 16)==16)
+														printf("%-20s ", header->next->booksInfo->subject);
+													printf("\n");		
+												}
+												else
+												{
+													printf("Not found this attribute-%s in table %s\n",comp_1,table_name_1);	
+												}
+											}
+											header_w = header_w->next;
+										} // WHERE clause
+										header = header->next;
+									} // for Buckets
+								}
+							
+							break;
 						}
 						header2 = header2->next;
 						count++;
@@ -291,9 +456,10 @@ void Do_SQL()
 											memset(comp_1,'\0',64*sizeof(char));
 											char comp_2[64];
 											memset(comp_2,'\0',64*sizeof(char));
-											sscanf(header_w->next->name,"%[^\n]", comp_1);
-											sscanf(comp_1,"%[^=]%*[=]%[^\n]",comp_1,comp_2);
+											//sscanf(header_w->next->name,"%[^\n]", comp_1);
+											sscanf(header_w->next->name,"%[^=]%*[=]%[^\n]",comp_1,comp_2);
 											sscanf(comp_1,"%s",comp_1);
+											
 											if(strcmp_ctrl(comp_1,attri_Name[5],0))
 											{
 												if(strcmp_ctrl(header->next->sellsInfo->uid,comp_2,0))
@@ -326,7 +492,16 @@ void Do_SQL()
 											}
 											else
 											{
-												printf("Not found this attribute-%s in table %s\n",table_name_2,comp_1);
+												if(strlen(comp_1)==0)
+												{
+													printf("%-20s ", header->next->sellsInfo->uid);
+													printf("%-20s ", header->next->sellsInfo->no);
+													printf("%-20s \n", header->next->sellsInfo->isbn_no);
+												}
+												else
+												{
+													printf("Not found this attribute-%s in table %s\n",comp_2,table_name_2);	
+												}
 											}
 											header_w = header_w->next;
 										}
@@ -339,8 +514,104 @@ void Do_SQL()
 						}
 						else
 						{
-							// TODO : implement
-							printf(" %s",header2->next->name);
+							// Do when only one table , and with selected 
+							int result = judgeSelect(forSelect,1);
+							printf("%d\n",result);
+							if((result & 32)==32)
+								printf("%-20s ",attri_Name[5]);
+							if((result & 64)==64)
+								printf("%-20s ",attri_Name[6]);
+							if((result & 128)==128)
+								printf("%-20s ",attri_Name[7]);
+							printf("\n");
+							
+							for(int j=0;j<10;j++)
+							{
+								attri_Value *header = &bucket_Header[5][j];
+								while(header->next != NULL)
+								{
+									// Check for the WHERE clause : FETCH for GROUP and "=" for compare
+									strLink *header_w = forWhere;
+									while(header_w->next != NULL)
+									{
+										char comp_1[64];
+										memset(comp_1,'\0',64*sizeof(char));
+										char comp_2[64];
+										memset(comp_2,'\0',64*sizeof(char));
+										sscanf(header_w->next->name,"%[^=] = %[^\n]",comp_1,comp_2);
+										sscanf(comp_1,"%s",comp_1);
+										
+										//printf("comp1: %s , comp2: %s\n",comp_1,comp_2);
+										
+										if(strcmp_ctrl(comp_1,attri_Name[5],0))
+										{
+											if(strcmp_ctrl(header->next->sellsInfo->uid,comp_2,0))
+											{
+												// Success and print 
+												if((result & 32)==32)
+													printf("%-20s ",header->next->sellsInfo->uid);
+												if((result & 64)==64)
+													printf("%-20s ",header->next->sellsInfo->no);
+												if((result & 128)==128)
+													printf("%-20s ",header->next->sellsInfo->isbn_no);
+												printf("\n");		
+											}
+										}
+										else if(strcmp_ctrl(comp_1,attri_Name[6],0))
+										{
+											if(strcmp_ctrl(header->next->sellsInfo->no,comp_2,0))
+											{
+												// Success and print 
+												if((result & 32)==32)
+													printf("%-20s ",header->next->sellsInfo->uid);
+												if((result & 64)==64)
+													printf("%-20s ",header->next->sellsInfo->no);
+												if((result & 128)==128)
+													printf("%-20s ",header->next->sellsInfo->isbn_no);
+												printf("\n");				
+											}
+										}
+										else if(strcmp_ctrl(comp_1,attri_Name[7],0))
+										{
+											if(strcmp_ctrl(header->next->sellsInfo->isbn_no,comp_2,0))
+											{
+												// Success and print 
+												if((result & 32)==32)
+													printf("%-20s ",header->next->sellsInfo->uid);
+												if((result & 64)==64)
+													printf("%-20s ",header->next->sellsInfo->no);
+												if((result & 128)==128)
+													printf("%-20s ",header->next->sellsInfo->isbn_no);
+												printf("\n");	
+											}
+										}
+										else
+										{
+											// When there don't have WHERE clause 
+											if(strlen(comp_1) == 0)
+											{
+												if((result & 32)==32)
+													printf("%-20s ",header->next->sellsInfo->uid);
+												if((result & 64)==64)
+													printf("%-20s ",header->next->sellsInfo->no);
+												if((result & 128)==128)
+													printf("%-20s ",header->next->sellsInfo->isbn_no);
+												printf("\n");			
+											}
+											else
+											{
+												printf("Not found this attribute-%s in table %s\n",comp_1,table_name_1);	
+											}
+										}
+										header_w = header_w->next;
+										memset(comp_1,'\0',64*sizeof(char));
+										memset(comp_2,'\0',64*sizeof(char));
+									} // WHERE clause
+									header = header->next;
+								} // for Buckets
+							}
+							
+							break;
 						}
 						header2 = header2->next;
 						count++;
@@ -356,13 +627,129 @@ void Do_SQL()
 		}
 		else{
 			// comp1 compare to none of each tables (reject)
-			printf("Error with comp1 %s !\n",comp1);
+			printf("Error , don't have %s table!\n",comp1);
 		}
 		header = header->next;
 	}
+}
+
+int judgeSelect(strLink *header,int mode)
+{
+	// Using 8 bits number to represent the attriName
+	int result = 0;
+	char string[64];
+	while(header->next != NULL)
+	{
+		sscanf(header->next->name,"%s",string);
+	// ==================================== For books ==================================== //
+		if(mode == 0)
+		{
+			if(strcmp_ctrl(string,attri_Name[0],0))
+			{
+				if((result & 1) == 1)
+				{
+					// This attri have been record before , ignore it
+				}
+				else if((result & 1) == 0)
+				{
+					// Set result
+					result += 1;
+				}
+			}
+			else if(strcmp_ctrl(string,attri_Name[1],0))
+			{
+				if((result & 2) == 2)
+				{
+					// This attri have been record before , ignore it
+				}
+				else if((result & 2) == 0)
+				{
+					// Set result 
+					result += 2;
+				}
+			}
+			else if(strcmp_ctrl(string,attri_Name[2],0))
+			{
+				if((result & 4) == 4)
+				{
+					// This attri have been record before , ignore it
+				}
+				else if((result & 4) == 0)
+				{
+					// Set result 
+					result += 4;
+				}
+			}
+			else if(strcmp_ctrl(string,attri_Name[3],0))
+			{
+				if((result & 8) == 8)
+				{
+					// This attri have been record before , ignore it
+				}
+				else if((result & 8) == 0)
+				{
+					// Set result 
+					result += 8;
+				}
+			}
+			else if(strcmp_ctrl(string,attri_Name[4],0))
+			{
+				if((result & 16) == 16)
+				{
+					// This attri have been record before , ignore it
+				}
+				else if((result & 16) == 0)
+				{
+					// Set result 
+					result += 16;
+				}
+			}
+		}
+		else if(mode == 1)
+		{
+	// ==================================== For sellRecord ==================================== //
+			if(strcmp_ctrl(string,attri_Name[5],0))
+			{
+				if((result & 32) == 32)
+				{
+					// This attri have been record before , ignore it
+				}
+				else if((result & 32) == 0)
+				{
+					// Set result 
+					result += 32;
+				}
+			}
+			else if(strcmp_ctrl(string,attri_Name[6],0))
+			{
+				if((result & 64) == 64)
+				{
+					// This attri have been record before , ignore it
+				}
+				else if((result & 64) == 0)
+				{
+					// Set result 
+					result += 64;
+				}
+			}
+			else if(strcmp_ctrl(string,attri_Name[7],0))
+			{
+				if((result & 128) == 128)
+				{
+					// This attri have been record before , ignore it
+				}
+				else if((result & 128) == 0)
+				{
+					// Set result 
+					result += 128;
+				}
+			}
+		}
+		header = header->next;
+		memset(string,'\0',64*sizeof(char));
+	}
 	
-	
-	
+	return result;
 }
 
 void read_SrcFile()
