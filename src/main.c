@@ -177,13 +177,9 @@ void Do_SQL()
 														strcpy(search,header->next->booksInfo->price);
 													else if(attr_1==4)
 														strcpy(search,header->next->booksInfo->subject);
-														
-													printf("%-20s ",header->next->booksInfo->isbn);
-													printf("%-20s ",header->next->booksInfo->author);
-													printf("%-20s ",header->next->booksInfo->title);
-													printf("%-20s ",header->next->booksInfo->price);
-													printf("%-20s ",header->next->booksInfo->subject);
+
 													// print sellRecord
+													int filter_temp = 0;
 													for(int k = 0 ;k < 10 ; k ++)
 													{
 														attri_Value *header_j = &bucket_Header[attr_2][k];
@@ -191,29 +187,38 @@ void Do_SQL()
 														{
 															if(strcmp_ctrl(header_j->next->value,search,0))
 															{
-																if(attr_2==5)
-																{
-																	printf("%-20s ",header_j->next->sellsInfo->no);
-																	printf("%-20s ",header_j->next->sellsInfo->isbn_no);
-																}
-																else if(attr_2==6)
-																{
-																	printf("%-20s ",header_j->next->sellsInfo->uid);
-																	printf("%-20s ",header_j->next->sellsInfo->isbn_no);
-																}
-																else if(attr_2==7)
-																{
-																	printf("%-20s ",header_j->next->sellsInfo->uid);
-																	printf("%-20s ",header_j->next->sellsInfo->no);
-																}
-																printf("\n");
+																filter_temp = 1;
 																break;
 															}
 															header_j = header_j->next;
 														}
+														if(filter_temp == 1)
+														{
+															printf("%-20s ",header->next->booksInfo->isbn);
+															printf("%-20s ",header->next->booksInfo->author);
+															printf("%-20s ",header->next->booksInfo->title);
+															printf("%-20s ",header->next->booksInfo->price);
+															printf("%-20s ",header->next->booksInfo->subject);
+															if(attr_2==5)
+															{
+																printf("%-20s ",header_j->next->sellsInfo->no);
+																printf("%-20s ",header_j->next->sellsInfo->isbn_no);
+															}
+															else if(attr_2==6)
+															{
+																printf("%-20s ",header_j->next->sellsInfo->uid);
+																printf("%-20s ",header_j->next->sellsInfo->isbn_no);
+															}
+															else if(attr_2==7)
+															{
+																printf("%-20s ",header_j->next->sellsInfo->uid);
+																printf("%-20s ",header_j->next->sellsInfo->no);
+															}
+															printf("\n");
+															filter_temp = 0;
+														}
 													}
 													memset(search,'\0',64*sizeof(char));
-													break;
 												}
 												header = header->next;
 											}
@@ -242,13 +247,9 @@ void Do_SQL()
 											else if(attr_1==4)
 												strcpy(search,header->next->booksInfo->subject);
 											
-											printf("%-20s ",header->next->booksInfo->isbn);
-											printf("%-20s ",header->next->booksInfo->author);
-											printf("%-20s ",header->next->booksInfo->title);
-											printf("%-20s ",header->next->booksInfo->price);
-											printf("%-20s ",header->next->booksInfo->subject);
 											
 											// print sellRecord
+											int filter_temp = 0;
 											for(int k = 0 ;k < 10 ; k ++)
 											{
 												attri_Value *header_j = &bucket_Header[attr_2][k];
@@ -256,6 +257,15 @@ void Do_SQL()
 												{
 													if(strcmp_ctrl(header_j->next->value,search,0))
 													{
+														filter_temp = 1;
+													}
+													if(filter_temp == 1)
+													{
+														printf("%-20s ",header->next->booksInfo->isbn);
+														printf("%-20s ",header->next->booksInfo->author);
+														printf("%-20s ",header->next->booksInfo->title);
+														printf("%-20s ",header->next->booksInfo->price);
+														printf("%-20s ",header->next->booksInfo->subject);
 														if(attr_2==5)
 														{
 															printf("%-20s ",header_j->next->sellsInfo->no);
@@ -272,7 +282,7 @@ void Do_SQL()
 															printf("%-20s ",header_j->next->sellsInfo->no);
 														}
 														printf("\n");
-														break;
+														filter_temp = 0;
 													}
 													header_j = header_j->next;
 												}
@@ -303,13 +313,9 @@ void Do_SQL()
 							{
 								// Compare Success
 								printf("List all attribute:\n");
-								for(int i = 0; i < 5 ; i++)
+								for(int i = 0; i < 8 ; i++)
 								{
-									printf("%-20s ",attri_Name[i]);
-								}
-								for(int i = 5; i < 8 ; i++)
-								{
-									if(attr_1 != i)
+									if(attr_2 != i)
 									{
 										printf("%-20s ",attri_Name[i]);	
 									}
@@ -346,10 +352,8 @@ void Do_SQL()
 													else if(attr_1==7)
 														strcpy(search,header->next->sellsInfo->isbn_no);
 														
-													printf("%-20s ",header->next->sellsInfo->uid);
-													printf("%-20s ",header->next->sellsInfo->no);
-													printf("%-20s ",header->next->sellsInfo->isbn_no);
 													// print sellRecord
+													int filter_temp = 0;
 													for(int k = 0 ;k < 10 ; k ++)
 													{
 														attri_Value *header_j = &bucket_Header[attr_2][k];
@@ -357,44 +361,51 @@ void Do_SQL()
 														{
 															if(strcmp_ctrl(header_j->next->value,search,0))
 															{
-																if(attr_2==0)
-																{
-																	printf("%-20s ",header_j->next->booksInfo->author);
-																	printf("%-20s ",header_j->next->booksInfo->title);
-																	printf("%-20s ",header_j->next->booksInfo->price);
-																	printf("%-20s ",header_j->next->booksInfo->subject);
-																}
-																else if(attr_2==1)
-																{
-																	printf("%-20s ",header_j->next->booksInfo->isbn);
-																	printf("%-20s ",header_j->next->booksInfo->title);
-																	printf("%-20s ",header_j->next->booksInfo->price);
-																	printf("%-20s ",header_j->next->booksInfo->subject);
-																}
-																else if(attr_2==2)
-																{
-																	printf("%-20s ",header_j->next->booksInfo->isbn);
-																	printf("%-20s ",header_j->next->booksInfo->author);
-																	printf("%-20s ",header_j->next->booksInfo->price);
-																	printf("%-20s ",header_j->next->booksInfo->subject);
-																}
-																else if(attr_2==3)
-																{
-																	printf("%-20s ",header_j->next->booksInfo->isbn);
-																	printf("%-20s ",header_j->next->booksInfo->author);
-																	printf("%-20s ",header_j->next->booksInfo->title);
-																	printf("%-20s ",header_j->next->booksInfo->subject);
-																}
-																else if(attr_2==4)
-																{
-																	printf("%-20s ",header_j->next->booksInfo->isbn);
-																	printf("%-20s ",header_j->next->booksInfo->author);
-																	printf("%-20s ",header_j->next->booksInfo->title);
-																	printf("%-20s ",header_j->next->booksInfo->price);
-																}
-																printf("\n");
-																break;
+																filter_temp = 1;
 															}
+															if(filter_temp==1)
+																{
+																	if(attr_2==0)
+																	{
+																		printf("%-20s ",header_j->next->booksInfo->author);
+																		printf("%-20s ",header_j->next->booksInfo->title);
+																		printf("%-20s ",header_j->next->booksInfo->price);
+																		printf("%-20s ",header_j->next->booksInfo->subject);
+																	}
+																	else if(attr_2==1)
+																	{
+																		printf("%-20s ",header_j->next->booksInfo->isbn);
+																		printf("%-20s ",header_j->next->booksInfo->title);
+																		printf("%-20s ",header_j->next->booksInfo->price);
+																		printf("%-20s ",header_j->next->booksInfo->subject);
+																	}
+																	else if(attr_2==2)
+																	{
+																		printf("%-20s ",header_j->next->booksInfo->isbn);
+																		printf("%-20s ",header_j->next->booksInfo->author);
+																		printf("%-20s ",header_j->next->booksInfo->price);
+																		printf("%-20s ",header_j->next->booksInfo->subject);
+																	}
+																	else if(attr_2==3)
+																	{
+																		printf("%-20s ",header_j->next->booksInfo->isbn);
+																		printf("%-20s ",header_j->next->booksInfo->author);
+																		printf("%-20s ",header_j->next->booksInfo->title);
+																		printf("%-20s ",header_j->next->booksInfo->subject);
+																	}
+																	else if(attr_2==4)
+																	{
+																		printf("%-20s ",header_j->next->booksInfo->isbn);
+																		printf("%-20s ",header_j->next->booksInfo->author);
+																		printf("%-20s ",header_j->next->booksInfo->title);
+																		printf("%-20s ",header_j->next->booksInfo->price);
+																	}
+																	printf("%-20s ",header->next->sellsInfo->uid);
+																	printf("%-20s ",header->next->sellsInfo->no);
+																	printf("%-20s ",header->next->sellsInfo->isbn_no);
+																	printf("\n");
+																	filter_temp = 0;
+																}
 															header_j = header_j->next;
 														}
 													}
@@ -409,56 +420,74 @@ void Do_SQL()
 								}
 								else
 								{
-									// equal to 0 , No WHERE clause , need to print out all attriName
+									// equal to 0 , No WHERE clause , need to print out all 
 									for(int i = 0 ; i< 10 ; i++)
 									{
-										attri_Value *header = &bucket_Header[attr_2][i];
+										attri_Value *header = &bucket_Header[attr_1][i];
 										while(header->next!=NULL)
 										{
 											// print books
 											char search[64];
-											if(attr_2==0)
-												strcpy(search,header->next->booksInfo->isbn);
-											else if(attr_2==1)
-												strcpy(search,header->next->booksInfo->author);
-											else if(attr_2==2)
-												strcpy(search,header->next->booksInfo->title);
-											else if(attr_2==3)
-												strcpy(search,header->next->booksInfo->price);
-											else if(attr_2==4)
-												strcpy(search,header->next->booksInfo->subject);
-											
-											printf("%-20s ",header->next->booksInfo->isbn);
-											printf("%-20s ",header->next->booksInfo->author);
-											printf("%-20s ",header->next->booksInfo->title);
-											printf("%-20s ",header->next->booksInfo->price);
-											printf("%-20s ",header->next->booksInfo->subject);
+											if(attr_1==5)
+												strcpy(search,header->next->sellsInfo->uid);
+											else if(attr_1==6)
+												strcpy(search,header->next->sellsInfo->no);
+											else if(attr_1==7)
+												strcpy(search,header->next->sellsInfo->isbn_no);
 											
 											// print sellRecord
+											int filter_temp = 0;
 											for(int k = 0 ;k < 10 ; k ++)
 											{
-												attri_Value *header_j = &bucket_Header[attr_1][k];
+												attri_Value *header_j = &bucket_Header[attr_2][k];
 												while(header_j->next != NULL)
 												{
 													if(strcmp_ctrl(header_j->next->value,search,0))
 													{
-														if(attr_1==5)
+														filter_temp = 1;
+													}
+													if(filter_temp == 1)
+													{
+														if(attr_2==0)
 														{
-															printf("%-20s ",header_j->next->sellsInfo->no);
-															printf("%-20s ",header_j->next->sellsInfo->isbn_no);
+															printf("%-20s ",header_j->next->booksInfo->author);
+															printf("%-20s ",header_j->next->booksInfo->title);
+															printf("%-20s ",header_j->next->booksInfo->price);
+															printf("%-20s ",header_j->next->booksInfo->subject);
 														}
-														else if(attr_1==6)
+														else if(attr_2==1)
 														{
-															printf("%-20s ",header_j->next->sellsInfo->uid);
-															printf("%-20s ",header_j->next->sellsInfo->isbn_no);
+															printf("%-20s ",header_j->next->booksInfo->isbn);
+															printf("%-20s ",header_j->next->booksInfo->title);
+															printf("%-20s ",header_j->next->booksInfo->price);
+															printf("%-20s ",header_j->next->booksInfo->subject);
 														}
-														else if(attr_1==7)
+														else if(attr_2==2)
 														{
-															printf("%-20s ",header_j->next->sellsInfo->uid);
-															printf("%-20s ",header_j->next->sellsInfo->no);
+															printf("%-20s ",header_j->next->booksInfo->isbn);
+															printf("%-20s ",header_j->next->booksInfo->author);
+															printf("%-20s ",header_j->next->booksInfo->price);
+															printf("%-20s ",header_j->next->booksInfo->subject);
 														}
+														else if(attr_2==3)
+														{
+															printf("%-20s ",header_j->next->booksInfo->isbn);
+															printf("%-20s ",header_j->next->booksInfo->author);
+															printf("%-20s ",header_j->next->booksInfo->title);
+															printf("%-20s ",header_j->next->booksInfo->subject);
+														}
+														else if(attr_2==4)
+														{
+															printf("%-20s ",header_j->next->booksInfo->isbn);
+															printf("%-20s ",header_j->next->booksInfo->author);
+															printf("%-20s ",header_j->next->booksInfo->title);
+															printf("%-20s ",header_j->next->booksInfo->price);
+														}
+														printf("%-20s ",header->next->sellsInfo->uid);
+														printf("%-20s ",header->next->sellsInfo->no);
+														printf("%-20s ",header->next->sellsInfo->isbn_no);
 														printf("\n");
-														break;
+														filter_temp = 0;
 													}
 													header_j = header_j->next;
 												}
