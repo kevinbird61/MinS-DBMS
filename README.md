@@ -15,6 +15,11 @@ Build own Database system.
   - select out all the attribute from the table
  - `SELECT * FROM table1 WHERE (table1)attri = value` 
   - select out all the attribute from the table , and you can using WHERE to choose which attribute you want.
+ - `SELECT * FROM table1 JOIN table2 ON table1_attri = table2_attri`
+  - select out the table with the join result.
+  - (`SELECT * FROM table2 JOIN table1 ON table2_attri = table1_attri` isn't supported.)
+ - `SELECT * FROM table1 JOIN table2 ON table1_attri = table2_attri WHERE xxx=yyy`
+  - select out the attribute that fullfill the condition "xxx=yyy".
 
 
 # Reference
