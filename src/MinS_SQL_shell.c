@@ -3,9 +3,6 @@
 
 #define CMD_SIZE 1024
 
-void AddStrLink(strLink *header , char *name);
-void dealClause(strLink *header , char *name);
-void releaseAll(strLink *header);
 int result;
 
 // ** For fetching command ** //
@@ -19,9 +16,6 @@ int fetch_cmd()
 	parse_cmd(cmd);
 	// Clear the command
 	memset(cmd,'\0',CMD_SIZE);
-	releaseAll(forSelect);
-	releaseAll(forFrom);
-	releaseAll(forWhere);
 	return result;
 }
 
@@ -176,7 +170,7 @@ int parse_cmd(char *cmd)
 				// Don't need to reuse where_cmd again , post_cmd now is the string we need 
 				printf("where clause : %s\n",post_cmd);
 				// Manipulate the post_cmd , add these into forwhere's linked-list
-				dealClause(forWhere,post_cmd);
+				dealClause(forWhere,post_cmd); 
 			}
 			else
 			{
@@ -208,6 +202,9 @@ int parse_cmd(char *cmd)
 	if(!filter1 && !filter2)
 	{
 	    result = 1;
+	    memset(pre_cmd,'\0',64*sizeof(char));	
+		memset(post_cmd,'\0',1024*sizeof(char));
+		memset(select_cmd,'\0',512*sizeof(char));
 	}
 	else
 	{
@@ -220,6 +217,9 @@ int parse_cmd(char *cmd)
 		{
 			result = 0;
 	    	printf("Please retype your SQL Query again!\n");
+	    	memset(pre_cmd,'\0',64*sizeof(char));	
+			memset(post_cmd,'\0',1024*sizeof(char));
+			memset(select_cmd,'\0',512*sizeof(char));
 	    }
 	}
 }
@@ -230,8 +230,6 @@ void dealClause(strLink *header , char *name)
 	char second[128];
 	char third[128];
 	
-	//sscanf(name,"%[^,]%[,]%[^\n]",first,second,third);
-
 	while(1)
 	{
 		sscanf(name,"%[^,]%[,]%[^\n]",first,second,third);
@@ -273,7 +271,10 @@ void AddStrLink(strLink *header , char *name)
 void releaseAll(strLink *header)
 {
     if(header->next != NULL)
-        releaseAll(header->next);
+    {
+    	memset(header->next->name,'\0',strlen(header->next->name)*sizeof(char));
+	   	releaseAll(header->next);	
+    }
     else
     {
         header = NULL;

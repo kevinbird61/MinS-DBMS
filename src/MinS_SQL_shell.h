@@ -18,3 +18,6 @@ strLink *forWhere;
 int fetch_cmd();
 char* read_cmd();
 int parse_cmd(char *cmd);
+void AddStrLink(strLink *header , char *name);
+void dealClause(strLink *header , char *name);
+void releaseAll(strLink *header);
