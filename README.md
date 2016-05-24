@@ -10,7 +10,7 @@ Build own Database system.
   - buckets_Header[`hash33(Attributes_Name)`][`hash33(Attributes_value)`]
  - And using 3 user-defined type linked-list to maintain the clause of `SELECT` , `FROM` , `WHERE`
 
-# Function of this DBMS (Now support)
+# Function of this DBMS (Currently support)
  - `SELECT * FROM table1`  
   - select out all the attribute from the table
  - `SELECT * FROM table1 WHERE (table1)attri = value` 
@@ -20,6 +20,8 @@ Build own Database system.
   - (`SELECT * FROM table2 JOIN table1 ON table2_attri = table1_attri` isn't supported.)
  - `SELECT * FROM table1 JOIN table2 ON table1_attri = table2_attri WHERE xxx=yyy`
   - select out the attribute that fullfill the condition "xxx=yyy".
+ - `SELECT DISTINCT attriName FROM attriName's Table`
+  - remove the same attributes choosing by user in that tables.
 
 
 # Reference
